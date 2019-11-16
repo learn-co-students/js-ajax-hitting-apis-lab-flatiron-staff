@@ -34,7 +34,14 @@ function displayBranches() {
   div.appendChild(ul);
 }
 
+function clear() {
+  document.getElementById('repositories').textContent = '';
+  document.getElementById('details').textContent = '';
+  document.querySelector('#username').value = '';
+}
+
 function displayRepositories() {
+  clear();
   const res = JSON.parse(this.responseText);
   const div = document.getElementById('repositories');
   const ul = document.createElement('ul');
@@ -47,8 +54,8 @@ function displayRepositories() {
     link.href = repo.html_url;
     link.target = '_blank';
 
-    const commitLink = createLink('Get Commits', displayCommits);
-    const branchLink = createLink('Get Branches', displayBranches);
+    const commitLink = createLink('Get Commits', getCommits);
+    const branchLink = createLink('Get Branches', getBranches);
 
     addAttrs([commitLink, branchLink], repo.owner.login, repo.name);
 
@@ -75,7 +82,7 @@ function createLink(text, cb) {
   const link = document.createElement('a');
 
   link.textContent = text;
-  link.addEventListener('click', () => cb(this));
+  link.addEventListener('click', function() { cb(this)});
   link.href = '#';
 
   return link;
@@ -83,8 +90,7 @@ function createLink(text, cb) {
 
 function request(url, cb) {
   const req = new XMLHttpRequest();
-
-  req.addEventListener('loaded', cb);
+  req.addEventListener('load', cb);
   req.open('GET', url);
   req.send();
 }
