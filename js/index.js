@@ -42,32 +42,43 @@ function displayRepositories() {
   res.forEach(repo => {
     const li = document.createElement('li');
     const link = document.createElement('a');
-    const commitLink = document.createElement('a');
-    const branchLink = document.createElement('a');
 
     link.textContent = repo.name;
     link.href = repo.html_url;
     link.target = '_blank';
-    link.setAttribute('data-username', repo.owner.login);
-    link.setAttribute('data-repository', repo.name);
 
-    commitLink.textContent = 'Get Commits';
-    commitLink.addEventListener('click', () => displayCommits(link));
-    commitLink.href = '#';
+    const commitLink = createLink('Get Commits', displayCommits);
+    const branchLink = createLink('Get Branches', displayBranches);
 
-    branchLink.textContent = 'Get Branches';
-    branchLink.addEventListener('click', () => displayBranches(link));
-    branchLink.href = '#';
+    addAttrs([commitLink, branchLink], repo.owner.login, repo.name);
 
-    li.appendChild(link);
-    li.appendChild(document.createTextNode(' | '));
-    li.appendChild(commitLink);
-    li.appendChild(document.createTextNode(' | '));
-    li.appendChild(branchLink);
+    const separator = document.createTextNode(' | ');
+
+    [link, separator, commitLink, separator.cloneNode(true), branchLink].forEach(el => (
+      li.appendChild(el)
+    ));
+
     ul.appendChild(li);
   });
 
   div.appendChild(ul);
+}
+
+function addAttrs(els, login, repoName) {
+  els.forEach(el => {
+    el.setAttribute('data-username', login);
+    el.setAttribute('data-repository', repoName);
+  });
+}
+
+function createLink(text, cb) {
+  const link = document.createElement('a');
+
+  link.textContent = text;
+  link.addEventListener('click', () => cb(this));
+  link.href = '#';
+
+  return link;
 }
 
 function request(url, cb) {
